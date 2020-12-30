@@ -17,14 +17,15 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 	"time"
-	"log"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	upnp "github.com/ndecker/fritzbox_exporter/fritzbox_upnp"
+	upnp "github.com/dhoinka/fritzbox_exporter/fritzbox_upnp"
 )
 
 const serviceLoadRetryTime = 1 * time.Minute
@@ -98,6 +99,18 @@ var metrics = []*Metric{
 		Desc: prometheus.NewDesc(
 			"gateway_wan_bytes_sent",
 			"bytes sent on gateway WAN interface",
+			[]string{"gateway"},
+			nil,
+		),
+		MetricType: prometheus.CounterValue,
+	},
+	{
+		Service: "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+		Action:  "GetAddonInfos",
+		Result:  "ByteReceiveRate",
+		Desc: prometheus.NewDesc(
+			"gateway_wan_bytes_received_rate",
+			"bytes received rate on gateway WAN interface",
 			[]string{"gateway"},
 			nil,
 		),
@@ -323,6 +336,6 @@ func main() {
 	prometheus.MustRegister(collector)
 	prometheus.MustRegister(collect_errors)
 
-	http.Handle("/metrics", prometheus.Handler())
+	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(*flag_addr, nil))
 }
