@@ -1,0 +1,16 @@
+version: '3'
+services:
+  fritzbox:
+    image: test
+    ports:
+      - '9133:9133'
+  promethus:
+    image: prom/prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - '~/workspace/fritzbox_exporter/config/prometheus.yml:/etc/prometheus/prometheus.yml'
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '3000:3000'

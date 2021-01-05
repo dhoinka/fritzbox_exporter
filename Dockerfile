@@ -1,12 +1,13 @@
-FROM golang:1.8-alpine
+FROM golang
 
-ADD . $GOPATH/src/github.com/ndecker/fritzbox_exporter
+WORKDIR /app
 
-RUN apk add --no-cache git
-RUN go get -v github.com/ndecker/fritzbox_exporter
+COPY . /app
+
+RUN go get
+RUN go build
 
 EXPOSE 9133
 
-ENTRYPOINT ["fritzbox_exporter"]
-CMD [""]
+CMD ["fritzbox_exporter"]
 
